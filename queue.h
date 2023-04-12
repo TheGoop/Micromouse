@@ -11,6 +11,7 @@ typedef struct queue_node {
 typedef struct {
   QueueNode* front;
   QueueNode* rear;
+  int length;
 } Queue;
 
 Queue* create_queue();
@@ -18,5 +19,6 @@ void enqueue(Queue* q, Coord data);
 Coord dequeue(Queue* q);
 int is_empty(Queue* q);
 void destroy_queue(Queue* q);
+int queue_size(Queue* q);
 
 #endif

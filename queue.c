@@ -18,6 +18,7 @@ void enqueue(Queue* q, Coord data) {
     q->rear->next = node;
     q->rear = node;
   }
+  q->length += 1;
 }
 
 Coord dequeue(Queue* q) {
@@ -32,6 +33,7 @@ Coord dequeue(Queue* q) {
   if (q->front == NULL) {
     q->rear = NULL;
   }
+  q->length -= 1;
   return data;
 }
 
@@ -44,4 +46,8 @@ void destroy_queue(Queue* q) {
     dequeue(q);
   }
   free(q);
+}
+
+int queue_size(Queue* q) {
+  return q->length;
 }
