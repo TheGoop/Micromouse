@@ -25,17 +25,28 @@ int validCoords(Coord curr) {
     return 0;
 }
 
-// int* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr_pos) {
+Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr) {
     
-//     Coord north = {curr_pos.row - 1, curr_pos.col};
-//     Coord south = {curr_pos.row + 1, curr_pos.col};
-//     Coord east = {curr_pos.row, curr_pos.col + 1};
-//     Coord west = {curr_pos.row, curr_pos.col - 1};
+    Coord* moves = (Coord*)malloc(4 * sizeof(Coord));
+    Coord north = {curr.row - 1, curr.col};
+    if (validCoords(north) && (long_walls[curr.row][curr.col] == 0)) {
+        moves[0] = north;
+    }
+    Coord south = {curr.row + 1, curr.col};
+    if (validCoords(south) && (long_walls[south.row][south.col] == 0)) {
+        moves[1] = south;
+    }
+    Coord west = {curr.row, curr.col - 1};
+    if (validCoords(west) && (lat_walls[curr.row][curr.col] == 0)) {
+        moves[2] = west;
+    }
+    Coord east = {curr.row, curr.col + 1};
+    if (validCoords(east) && (lat_walls[east.row][east.col] == 0)) {
+        moves[3] = east;
+    }
 
-//     // Coord possible_moves = 
-//     return 
-
-// }
+    return moves;
+}
 
 void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal) { 
     Queue *q = create_queue();

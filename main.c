@@ -7,7 +7,6 @@
 
 // Returns a nxn 2d array of ints of manhattan distances from the middle 
 // of maze. 
-// Convention for this code is that bottom left is 0,0.
 int **create_manhattan_dists(int rows, int cols) {
 
     Coord midpoint = {rows / 2, cols / 2};
@@ -116,9 +115,12 @@ int main(int argc, char* argv[]) {
     int **lat_walls = create_lat_walls(NUM_ROWS, NUM_COLS);
 
 
-    Coord curr = {0,0};
-    Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
+    // we start at the bottom left of the grid
+    Coord curr = {NUM_ROWS - 1,0};
     Heading dir = NORTH;
+
+    // we aim to get to the middle of the grid
+    Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
 
     return 0;
     while (1) {
