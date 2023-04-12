@@ -93,12 +93,16 @@ void printWalls(int **walls, int rows, int cols) {
     }
 }
 
-void printLongWalls(int **walls, int rows, int cols) {
+void printLongWalls(int **walls) {
+    int rows = NUM_ROWS;
+    int cols = NUM_COLS;
     fprintf(stderr, "Longitudal Walls... \n");
     printWalls(walls, rows + 1, cols);
 }
 
-void printLatWalls(int **walls, int rows, int cols) {
+void printLatWalls(int **walls) {
+    int rows = NUM_ROWS;
+    int cols = NUM_COLS;
     fprintf(stderr, "Lateral Walls... \n");
     printWalls(walls, rows, cols + 1);
 }
@@ -122,6 +126,7 @@ int main(int argc, char* argv[]) {
     // we aim to get to the middle of the grid
     Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
 
+
     return 0;
     while (1) {
         Action nextMove = solver();
@@ -140,3 +145,19 @@ int main(int argc, char* argv[]) {
         }
     }
 }
+
+
+/**
+    lat_walls[NUM_ROWS - 1][1] = 1;
+    lat_walls[NUM_ROWS - 2][1] = 1;
+    lat_walls[NUM_ROWS - 3][1] = 1;
+    printLatWalls(lat_walls);
+
+    long_walls[1][2] = 1;
+    long_walls[2][2] = 1;
+    long_walls[3][2] = 1;
+    printLongWalls(long_walls);
+
+    recalculateDists(dists, long_walls, lat_walls, goal);
+    printGridDistances(dists, NUM_ROWS, NUM_COLS);
+*/

@@ -10,6 +10,7 @@ typedef enum Action {LEFT, FORWARD, RIGHT, IDLE} Action;
 Action solver();
 Action leftWallFollower();
 Action floodFill();
+void recalculateDists();
 
 
 #endif
