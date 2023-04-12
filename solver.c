@@ -1,5 +1,7 @@
 #include "solver.h"
 #include "API.h"
+#include "coord.h"
+#include "queue.h"
 
 Action solver() {
     return leftWallFollower();
@@ -23,8 +25,26 @@ int validCoords(Coord curr) {
     return 0;
 }
 
-void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal) { 
+// int* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr_pos) {
+    
+//     Coord north = {curr_pos.row - 1, curr_pos.col};
+//     Coord south = {curr_pos.row + 1, curr_pos.col};
+//     Coord east = {curr_pos.row, curr_pos.col + 1};
+//     Coord west = {curr_pos.row, curr_pos.col - 1};
 
+//     // Coord possible_moves = 
+//     return 
+
+// }
+
+void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal) { 
+    Queue *q = create_queue();
+    int curr_steps = 0;
+    enqueue(q, goal);
+
+    while (!is_empty(q)) {
+        
+    }
 }
 
 // Put your implementation of floodfill here!

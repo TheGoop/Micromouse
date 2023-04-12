@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "solver.h"
 #include "API.h"
+#include "coord.h"
 
 
 // Returns a nxn 2d array of ints of manhattan distances from the middle 
