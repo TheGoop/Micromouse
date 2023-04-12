@@ -4,60 +4,122 @@
 #include "API.h"
 
 
-// Creates and returns a 2D array of GridBlocks
-// the coords have 0,0 as the bottom left of the grid aka the start point
-// When making the manhattan distances, we take them from the middle of the grid
-struct GridBlock **createGrid(int rows, int cols) {
-    struct GridBlock **grid = (struct GridBlock **) malloc(rows * sizeof(struct GridBlock *));
-    
-    int i, j;
+// Returns a nxn 2d array of ints of manhattan distances from the middle 
+// of maze. 
+// Convention for this code is that bottom left is 0,0.
+int **create_manhattan_dists(int rows, int cols) {
 
-    struct Coord midpoint = {rows / 2, cols / 2};
-    
-    for (i = 0; i < rows; i++) {
-        grid[i] = (struct GridBlock *) malloc(cols * sizeof(struct GridBlock));
-        for (j = 0; j < cols; j++) {
-            grid[i][j].coord.row = i;
-            grid[i][j].coord.col = j;
-            grid[i][j].hasNorthWall = 0;
-            grid[i][j].hasSouthWall = 0;
-            grid[i][j].hasEastWall = 0;
-            grid[i][j].hasWestWall = 0;
-            grid[i][j].distance = abs(midpoint.row - i) + abs(midpoint.col - j);
-        }
+    Coord midpoint = {rows / 2, cols / 2};
+
+    int **dists = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++) {
+        dists[i] = (int *)malloc(cols * sizeof(int));
     }
 
-    return grid;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            dists[i][j] = abs(midpoint.row - i) + abs(midpoint.col - j);
+        }
+    }
+    return dists;
+}
+
+
+int **create_int_matrix(int rows, int cols){
+    int **walls = (int **)malloc((rows) * sizeof(int *));
+    for (int i = 0; i < rows; i++) {
+        walls[i] = (int *)malloc((cols + 1) * sizeof(int));
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            walls[i][j] = 0;
+        }
+    }
+    return walls;
+}
+
+// Creates a (n x n+1) matrix of ints that represent whether there is a wall
+// between two blocks in the grid/maze preventing going left or right.
+// To see whether there is a wall to the left of (0,1) separating it from (0,0),
+// check whether walls[0,1] is 1.
+int **create_lat_walls(int rows, int cols) {
+    int **walls = create_int_matrix(rows, cols + 1);
+
+    for (int i = 0; i < rows; i++) {
+        walls[i][0] = 1;
+        walls[i][cols] = 1;
+    }
+
+    return walls;
+}
+
+// Creates a (n+1 x n) matrix of ints that represent whether there is a wall
+// between two blocks in the grid/maze preventing going up or down.
+// To see whether there is a wall below (1,0) separating it from (0,0),
+// check whether walls[1,0] is 1.
+int **create_long_walls(int rows, int cols) {
+    int **walls = create_int_matrix(rows + 1, cols);
+    for (int j = 0; j < cols; j++) {
+        walls[0][j] = 1;
+        walls[rows][j] = 1;
+    }
+    return walls;
 }
 
 // Prints a grid with the manhattan distances from the center of the grid
-void printGridDistances(struct GridBlock **grid, int rows, int cols){
+void printGridDistances(int **grid, int rows, int cols){
     fprintf(stderr, "Grid Distances... \n");
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
         {
-            fprintf(stderr, "%d ", grid[i][j].distance);
+            fprintf(stderr, "%d ", grid[i][j]);
         }
         fprintf(stderr, "\n");
     }
 }
 
+void printWalls(int **walls, int rows, int cols) {
+    for (int i = 0; i < rows; i ++){
+        for (int j = 0; j < cols; j++) {
+            fprintf(stderr, "%d ", walls[i][j]);
+        }
+        fprintf(stderr, "\n");
+    }
+}
 
-// This program just runs solver and passes the choices
+void printLongWalls(int **walls, int rows, int cols) {
+    fprintf(stderr, "Longitudal Walls... \n");
+    printWalls(walls, rows + 1, cols);
+}
+
+void printLatWalls(int **walls, int rows, int cols) {
+    fprintf(stderr, "Lateral Walls... \n");
+    printWalls(walls, rows, cols + 1);
+}
+
+
+// You do not need to edit this file.
+// This program just runs your solver and passes the choices
 // to the simulator.
 int main(int argc, char* argv[]) {
     debug_log("Running...");
 
-    struct GridBlock **grid = createGrid(NUM_GRID_ROWS, NUM_GRID_COLS);
-    // printGridDistances(grid, NUM_GRID_ROWS, NUM_GRID_COLS);
+    int **dists = create_manhattan_dists(NUM_ROWS, NUM_COLS);
+    int **long_walls = create_long_walls(NUM_ROWS, NUM_COLS);
+    int **lat_walls = create_lat_walls(NUM_ROWS, NUM_COLS);
 
 
-    // Start off at bottom left facing north, goal is to get to middle
-    struct Coord goal_position = {NUM_GRID_ROWS/2, NUM_GRID_COLS/2};
-    struct Coord curr_position = {0,0};
+    Coord curr = {0,0};
+    Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
     Heading dir = NORTH;
 
+    return 0;
     while (1) {
         Action nextMove = solver();
         switch(nextMove){

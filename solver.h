@@ -1,28 +1,20 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
+#define NUM_ROWS 5
+#define NUM_COLS 5
+
 typedef enum Heading {NORTH, EAST, SOUTH, WEST} Heading;
 typedef enum Action {LEFT, FORWARD, RIGHT, IDLE} Action;
 
-#define NUM_GRID_ROWS 8
-#define NUM_GRID_COLS 8
+typedef struct {
+    int row;
+    int col;
+} Coord;
 
 Action solver();
 Action leftWallFollower();
 Action floodFill();
 
-struct Coord {
-    int row;
-    int col;
-};
-
-struct GridBlock {
-    struct Coord coord;
-    int hasNorthWall;
-    int hasSouthWall;
-    int hasEastWall;
-    int hasWestWall;
-    int distance;
-};
 
 #endif

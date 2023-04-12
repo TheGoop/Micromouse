@@ -1,6 +1,5 @@
 #include "solver.h"
 #include "API.h"
-#include "queue.h"
 
 Action solver() {
     return leftWallFollower();
@@ -17,22 +16,20 @@ Action leftWallFollower() {
     return FORWARD;
 }
 
-int isValidCoord(int row, int col) {
-    if ((row >= 0 && row < NUM_GRID_ROWS) && (col >= 0 && col < NUM_GRID_COLS)) {
+int validCoords(Coord curr) {
+    if ((curr.row >= 0 && curr.row < NUM_ROWS) && (curr.col >= 0 && curr.col < NUM_COLS)) {
         return 1;
     }
     return 0;
 }
 
-// Recalculates all of the manhattan distances of grid based upon new wall information
-void recalculateDistances(struct GridBlock** grid) {
-    return;
-    
+void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal) { 
+
 }
 
 // Put your implementation of floodfill here!
-Action floodFill(struct GridBlock **grid, struct Coord curr, Heading dir, struct Coord goal) {
-
-
+Action floodFill(int **dists, int **long_walls, int **lat_walls, 
+        Coord goal, Coord curr, Heading dir) 
+{
     return IDLE;
 }
