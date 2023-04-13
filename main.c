@@ -6,6 +6,24 @@
 #include "matrix.h"
 
 
+
+char* dirToString(Heading dir) {
+    if (dir == NORTH) {
+        return "NORTH";
+    }
+    else if (dir == SOUTH) {
+        return "SOUTH";
+    }
+
+    else if (dir == WEST) {
+        return "WEST";
+    }
+    else {
+        return "EAST";
+    }
+}
+
+
 // You do not need to edit this file.
 // This program just runs your solver and passes the choices
 // to the simulator.
@@ -23,22 +41,29 @@ int main(int argc, char* argv[]) {
 
     // we aim to get to the middle of the grid
     Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
+    
+
+    // recalculateDists(dists, long_walls, lat_walls);
 
     while (1) {
-        debug_log("Figuring out move.");
-        Action nextMove = floodFill(dists, long_walls, lat_walls, goal, curr, dir);
-
-        // printLongWalls(long_walls);
-        // printLatWalls(lat_walls);
+        fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
+        Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
+        printGridDistances(dists);
         switch(nextMove){
             case FORWARD:
                 API_moveForward();
+                updateCoordAfterMovingForward(&curr, dir);
+                debug_log("MOVE FORWARD");
                 break;
             case LEFT:
                 API_turnLeft();
+                updateDirectionAfterTurning(&dir, LEFT);
+                debug_log("TURN LEFT");
                 break;
             case RIGHT:
                 API_turnRight();
+                updateDirectionAfterTurning(&dir, RIGHT);
+                debug_log("TURN RIGHT");
                 break;
             case IDLE:
                 break;

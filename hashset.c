@@ -14,6 +14,7 @@ HashSet* hashset_create(int capacity) {
   HashSet* set = malloc(sizeof(HashSet));
   set->buckets = calloc(capacity, sizeof(Coord));
   set->capacity = capacity;
+  set->curr_size = 0;
   return set;
 }
 
@@ -31,6 +32,7 @@ void hashset_add(HashSet* set, Coord coord) {
     index = (index + 1) % set->capacity;
   }
   set->buckets[index] = coord;
+  set->curr_size += 1;
 }
 
 void hashset_remove(HashSet* set, Coord coord) {
@@ -43,6 +45,7 @@ void hashset_remove(HashSet* set, Coord coord) {
     }
     index = (index + 1) % set->capacity;
   }
+  set->curr_size -= 1;
 }
 
 int hashset_contains(HashSet* set, Coord coord) {
@@ -54,4 +57,8 @@ int hashset_contains(HashSet* set, Coord coord) {
     index = (index + 1) % set->capacity;
   }
   return 0;
+}
+
+int hashset_size(HashSet* set) {
+  return set->curr_size;
 }

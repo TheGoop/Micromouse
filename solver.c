@@ -5,6 +5,7 @@
 #include "matrix.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 Action solver() {
     return leftWallFollower();
@@ -19,6 +20,64 @@ Action leftWallFollower() {
         return LEFT;
     }
     return FORWARD;
+}
+
+
+void updateDirectionAfterTurning(Heading *dir, Action action) {
+    if (*dir == NORTH) {
+        if (action == LEFT) {
+            *dir = WEST;
+        }
+        else if (action == RIGHT) {
+            *dir = EAST;
+        }
+    }
+    else if (*dir == SOUTH) {
+        if (action == LEFT) {
+            *dir = EAST;
+        }
+        else if (action == RIGHT) {
+            *dir = WEST;
+        }
+    }
+    else if (*dir == EAST) {
+        if (action == LEFT) {
+            *dir = NORTH;
+        }
+        else if (action == RIGHT) {
+            *dir = SOUTH;
+        }
+    }
+    // west
+    else {
+        if (action == LEFT) {
+            *dir = SOUTH;
+        }
+        else if (action == RIGHT) {
+            *dir = NORTH;
+        }
+    }
+}
+
+void updateCoordAfterMovingForward(Coord *curr, Heading dir) {
+
+    if (dir == NORTH) {
+        curr->row -= 1;
+    }
+
+    else if (dir == SOUTH) {
+        curr->row += 1;
+    }
+
+    else if (dir == EAST) {
+        curr->col += 1;
+    }
+    
+    // west
+    else {
+        curr->col -= 1;
+    }
+    
 }
 
 int validCoords(Coord curr) {
@@ -64,21 +123,37 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
         }
     }
 
+    // printLatWalls(lat_walls);
+    // printLongWalls(long_walls);
+    // printGridDistances(dists);
+
     Queue *q = create_queue();
     int curr_steps = 0;
     enqueue(q, goal);
 
+
     HashSet *visited = hashset_create((NUM_ROWS + 1) * (NUM_COLS + 1));
+    
+    fprintf(stderr, "Queue Size: %d, Visited Size: %d\n", queue_size(q), hashset_size(visited));
+
     // BFS
-    while (is_empty(q) != 0) {
-        fprintf(stderr, "%d\n", queue_size(q));
+    while (is_empty(q) == 0) {
         // look at all of the blocks one flood level outwards
         int iters = queue_size(q);
         for (int i = 0; i < iters; i++) {
-            // examine a block and mark its distance from the goal
+            // examine a block  
             Coord temp = dequeue(q);
+
+            // if block already looked at, move on
+            if (hashset_contains(visited, temp)) {
+                continue;
+            }
+
+            // mark its distance from the goal
             dists[temp.row][temp.col] = curr_steps < dists[temp.row][temp.col] ? curr_steps : dists[temp.row][temp.col];
 
+            // fprintf(stderr, "Curr: %d, %d\n", temp.row, temp.col);
+            // usleep(10000);
             // add the next level of flood to the queue
             Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp);
             for (int j = 0; j < 4; j++) {
@@ -195,6 +270,10 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
             markDirectionalWall(curr, SOUTH, long_walls, lat_walls);
         }
     }
+
+    
+    // printLatWalls(lat_walls);
+    // printLongWalls(long_walls);
 }
 
 // Gets action to change from facing one direction to change to facing an intended direction
@@ -289,46 +368,48 @@ Action getActionForNextMove(Coord start, Coord end, Heading dir) {
 
 // Put your implementation of floodfill here!
 Action floodFill(int **dists, int **long_walls, int **lat_walls, 
-        Coord goal, Coord curr, Heading dir) 
+        Coord goal, Coord *curr, Heading dir) 
 {
 
     // check for walls around curr and update wall matrices
-    markWallsAround(curr, dir, long_walls, lat_walls);
+    markWallsAround(*curr, dir, long_walls, lat_walls);
 
-    debug_log("Recalculating Distances...");
+    // debug_log("Recalculating Distances...");
     // update manhattan distances
     recalculateDists(dists, long_walls, lat_walls, goal);
 
 
     int smallestDist = NUM_ROWS * NUM_COLS + 2;
-    Coord *nextBlock = NULL;
+    Coord nextBlock = {-1,-1};
 
-    debug_log("Getting Valid Moves...");
-    printLatWalls(lat_walls);
-    printLongWalls(long_walls);
+    // debug_log("Getting Valid Moves...");
     // get valid blocks
-    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, curr);
+    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, *curr);
 
     // pick block with smallest manhattan distance 
     for (int i = 0; i < 4; i++) {
-        fprintf(stderr, "%d, %d\n", valid_pos[i].row, valid_pos[i].col);
+        // fprintf(stderr, "%d, %d\n", valid_pos[i].row, valid_pos[i].col);
+        // fprintf(stderr, "Smallest Distance: %d\n", smallestDist);
         if (validCoords(valid_pos[i])) {
+            // fprintf(stderr, "Coord distance: %d\n", dists[valid_pos[i].row][valid_pos[i].col]);
             if (i == 0 || dists[valid_pos[i].row][valid_pos[i].col] < smallestDist) {
-                nextBlock = &valid_pos[i];
+                nextBlock.row = valid_pos[i].row;
+                nextBlock.col = valid_pos[i].col;
+                smallestDist = dists[valid_pos[i].row][valid_pos[i].col];
+                // debug_log("Something chosen");
             }
         }
     }
-    debug_log("Chose Best Block.");
-    if (nextBlock == NULL) {
+    if (nextBlock.row == -1 && nextBlock.col == -1) {
         fprintf(stderr, "Block chosen is null.\n");
         exit(EXIT_FAILURE);
     }
+    debug_log("Chose Best Block.");
 
-    fprintf(stderr, "Move to: (%d, %d)\n", nextBlock->row, nextBlock->col);
+    fprintf(stderr, "Move to: (%d, %d)\n", nextBlock.row, nextBlock.col);
 
     // figure out relative to curr and dir, which direction to go for block
-    Action nextAction = getActionForNextMove(curr, *nextBlock, dir);
-    
+    Action nextAction = getActionForNextMove(*curr, nextBlock, dir);
     free(valid_pos);
     return nextAction;
 }

@@ -69,11 +69,11 @@ int **create_long_walls(int rows, int cols) {
 }
 
 // Prints a grid with the manhattan distances from the center of the grid
-void printGridDistances(int **grid, int rows, int cols){
+void printGridDistances(int **grid){
     fprintf(stderr, "Grid Distances... \n");
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < NUM_ROWS; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < NUM_COLS; j++)
         {
             fprintf(stderr, "%d ", grid[i][j]);
         }

@@ -4,6 +4,7 @@
 
 Queue* create_queue() {
   Queue* q = (Queue*)malloc(sizeof(Queue));
+  q->length = 0;
   q->front = q->rear = NULL;
   return q;
 }
