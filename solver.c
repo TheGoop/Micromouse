@@ -93,6 +93,9 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
         // increment the flood level count
         curr_steps += 1;
     }
+
+    hashset_free(visited);
+    destroy_queue(q);
 }
 
 // Put your implementation of floodfill here!
