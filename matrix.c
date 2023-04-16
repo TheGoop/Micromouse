@@ -91,10 +91,8 @@ void printWalls(int **walls, int rows, int cols) {
 }
 
 void printLongWalls(int **walls) {
-    int rows = NUM_ROWS;
-    int cols = NUM_COLS;
     fprintf(stderr, "Longitudal Walls... \n");
-    printWalls(walls, rows + 1, cols);
+    printWalls(walls, NUM_ROWS + 1, NUM_COLS + 1);
 }
 
 void printLatWalls(int **walls) {

@@ -4,6 +4,12 @@
 
 #define BUFFER_SIZE 32
 
+
+void debug_log(char* text) {
+    fprintf(stderr, "%s\n", text);
+    fflush(stderr);
+}
+
 int getInteger(char* command) {
     printf("%s\n", command);
     fflush(stdout);
@@ -56,6 +62,7 @@ int API_moveForward() {
 }
 
 void API_turnRight() {
+    // debug_log("TURNING RIGHT -- API");
     getAck("turnRight");
 }
 
@@ -109,9 +116,4 @@ int API_wasReset() {
 
 void API_ackReset() {
     getAck("ackReset");
-}
-
-void debug_log(char* text) {
-    fprintf(stderr, "%s\n", text);
-    fflush(stderr);
 }

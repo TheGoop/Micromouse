@@ -87,7 +87,7 @@ int validCoords(Coord curr) {
     return 0;
 }
 
-Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr) {
+Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr, int notFloodFill) {
     Coord invalid = {-1,-1};
     Coord* moves = (Coord*)malloc(4 * sizeof(Coord));
     for (int i = 0; i < 4; i++) {
@@ -95,7 +95,8 @@ Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr)
     }
 
     Coord north = {curr.row - 1, curr.col};
-    if (validCoords(north) && (long_walls[curr.row][curr.col] == 0)) {
+    
+    if (validCoords(north) && (long_walls[north.row][north.col] == 0)) {
         moves[0] = north;
     }
     Coord south = {curr.row + 1, curr.col};
@@ -155,7 +156,7 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
             // fprintf(stderr, "Curr: %d, %d\n", temp.row, temp.col);
             // usleep(10000);
             // add the next level of flood to the queue
-            Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp);
+            Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
             for (int j = 0; j < 4; j++) {
                 // if valid moves, and not visited before, we will visit it
                 if (validCoords(validMoves[j]) && hashset_contains(visited, validMoves[j]) == 0) {
@@ -178,11 +179,11 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
 void markDirectionalWall(Coord curr, Heading wall_dir, int **long_walls, int **lat_walls) {
 
     if (wall_dir == NORTH) {
-        long_walls[curr.row][curr.col] = 1;
+        long_walls[curr.row - 1][curr.col] = 1;
     }
 
     else if (wall_dir == SOUTH) {
-        long_walls[curr.row + 1][curr.col] = 1;
+        long_walls[curr.row][curr.col] = 1;
     }
 
     else if (wall_dir == WEST) {
@@ -206,7 +207,6 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
 
         // if wall west of us
         if (API_wallLeft()) {
-            
             debug_log("Seen Wall West");
             markDirectionalWall(curr, WEST, long_walls, lat_walls);
         }
@@ -221,6 +221,7 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
     else if (dir == SOUTH) {
         // if wall south of us
         if (API_wallFront()) {
+            debug_log("Seen Wall North");
             markDirectionalWall(curr, NORTH, long_walls, lat_walls);
         }
 
@@ -232,6 +233,7 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
 
         // if wall west of us
         if (API_wallRight()) {
+            debug_log("Seen Wall West");
             markDirectionalWall(curr, WEST, long_walls, lat_walls);
         }
     }
@@ -239,16 +241,19 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
     else if (dir == WEST) {
         // if wall west of us
         if (API_wallFront()) {
+            debug_log("Seen Wall West");
             markDirectionalWall(curr, WEST, long_walls, lat_walls);
         }
 
         // if wall south of us
         if (API_wallLeft()) {
+            debug_log("Seen Wall South");
             markDirectionalWall(curr, SOUTH, long_walls, lat_walls);
         }
 
         // if wall north of us
         if (API_wallRight()) {
+            debug_log("Seen Wall North");
             markDirectionalWall(curr, NORTH, long_walls, lat_walls);
         }
     }
@@ -257,23 +262,23 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
     else {
         // if wall east of us
         if (API_wallFront()) {
-            markDirectionalWall(curr, WEST, long_walls, lat_walls);
+            debug_log("Seen Wall East");
+            markDirectionalWall(curr, EAST, long_walls, lat_walls);
         }
 
         // if wall north of us
         if (API_wallLeft()) {
+            debug_log("Seen Wall North");
             markDirectionalWall(curr, NORTH, long_walls, lat_walls);
         }
 
         // if wall south of us
         if (API_wallRight()) {
+            debug_log("Seen Wall South");
             markDirectionalWall(curr, SOUTH, long_walls, lat_walls);
         }
     }
 
-    
-    // printLatWalls(lat_walls);
-    // printLongWalls(long_walls);
 }
 
 // Gets action to change from facing one direction to change to facing an intended direction
@@ -384,7 +389,7 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
 
     // debug_log("Getting Valid Moves...");
     // get valid blocks
-    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, *curr);
+    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, *curr, 1);
 
     // pick block with smallest manhattan distance 
     for (int i = 0; i < 4; i++) {

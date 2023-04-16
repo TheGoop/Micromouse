@@ -44,11 +44,13 @@ int main(int argc, char* argv[]) {
     
 
     // recalculateDists(dists, long_walls, lat_walls);
-
+    int count = 0;
     while (1) {
+        debug_log("-----------------------");
         fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
         Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
-        printGridDistances(dists);
+        printLatWalls(lat_walls);
+        // printLongWalls(long_walls);
         switch(nextMove){
             case FORWARD:
                 API_moveForward();
@@ -67,6 +69,12 @@ int main(int argc, char* argv[]) {
                 break;
             case IDLE:
                 break;
+        }
+
+        fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
+        count += 1;
+        if (count > 7) {
+            break;
         }
     }
 }
