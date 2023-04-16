@@ -94,33 +94,37 @@ Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr,
         moves[i] = invalid;
     }
 
-    Coord north = {curr.row - 1, curr.col};
     
+    Coord north = {curr.row - 1, curr.col};
     if (validCoords(north) && (long_walls[north.row][north.col] == 0)) {
-        moves[0] = north;
+        moves[0].row = curr.row - 1;
+        moves[0].col = curr.col;
     }
-    Coord south = {curr.row + 1, curr.col};
+    Coord south = {curr.row, curr.col};
     if (validCoords(south) && (long_walls[south.row][south.col] == 0)) {
-        moves[1] = south;
+        moves[1].row = curr.row + 1;
+        moves[1].col = curr.col;
     }
-    Coord west = {curr.row, curr.col - 1};
+    Coord west = {curr.row, curr.col};
     if (validCoords(west) && (lat_walls[curr.row][curr.col] == 0)) {
-        moves[2] = west;
+        moves[2].row = curr.row;
+        moves[2].col = curr.col - 1;
     }
     Coord east = {curr.row, curr.col + 1};
     if (validCoords(east) && (lat_walls[east.row][east.col] == 0)) {
-        moves[3] = east;
+        moves[3].row = curr.row;
+        moves[3].col = curr.col + 1;
     }
 
     return moves;
 }
 
 
-void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal) { 
+void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal, int debug) { 
     // reset dists to an impossibly high number so that we don't accidentally maintain any old info
     for (int i = 0; i < NUM_ROWS; i++) {
         for (int j = 0; j < NUM_COLS; j++) {
-            dists[i][j] = NUM_ROWS * NUM_COLS + 2;
+            dists[i][j] = 100000;
         }
     }
 
@@ -139,6 +143,8 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
 
     // BFS
     while (is_empty(q) == 0) {
+
+        fprintf(stderr, "--------- FLOOD LEVEL %d ---------\n", curr_steps);
         // look at all of the blocks one flood level outwards
         int iters = queue_size(q);
         for (int i = 0; i < iters; i++) {
@@ -160,6 +166,9 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
             for (int j = 0; j < 4; j++) {
                 // if valid moves, and not visited before, we will visit it
                 if (validCoords(validMoves[j]) && hashset_contains(visited, validMoves[j]) == 0) {
+                    if(debug) {
+                        fprintf(stderr, "Curr: %d, %d to Valid Coords: %d, %d\n", temp.row, temp.col, validMoves[j].row, validMoves[j].col);
+                    }
                     enqueue(q, validMoves[j]);
                 }
             }
@@ -381,7 +390,7 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
 
     // debug_log("Recalculating Distances...");
     // update manhattan distances
-    recalculateDists(dists, long_walls, lat_walls, goal);
+    recalculateDists(dists, long_walls, lat_walls, goal, 1);
 
 
     int smallestDist = NUM_ROWS * NUM_COLS + 2;
@@ -407,6 +416,9 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
     }
     if (nextBlock.row == -1 && nextBlock.col == -1) {
         fprintf(stderr, "Block chosen is null.\n");
+        printLatWalls(lat_walls);
+        printLongWalls(long_walls);
+        printGridDistances(dists);
         exit(EXIT_FAILURE);
     }
     debug_log("Chose Best Block.");

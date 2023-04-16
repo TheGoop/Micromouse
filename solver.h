@@ -14,7 +14,7 @@ Action leftWallFollower();
 Action floodFill(int **dists, int **long_walls, int **lat_walls, 
         Coord goal, Coord *curr, Heading dir);
 void recalculateDists();
-
+Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr, int notFloodFill);
 void updateCoordAfterMovingForward(Coord *curr, Heading dir);
 void updateDirectionAfterTurning(Heading *dir, Action action);
 
