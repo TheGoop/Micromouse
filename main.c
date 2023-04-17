@@ -23,6 +23,12 @@ char* dirToString(Heading dir) {
     }
 }
 
+void gotoGoal(int **dists, int **long_walls, int **lat_walls, 
+        Coord *goal, Coord *curr, Heading *dir) {
+// TODO
+    
+}
+
 
 // You do not need to edit this file.
 // This program just runs your solver and passes the choices
@@ -43,14 +49,13 @@ int main(int argc, char* argv[]) {
     Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
     
 
-    int count = 0;
     int flag = 1;
     // printLongWalls(long_walls);
     while (flag) {
         debug_log("-----------------------");
         fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
         Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
-        printLongWalls(long_walls);
+        // printLongWalls(long_walls);
         switch(nextMove){
             case FORWARD:
                 API_moveForward();
@@ -73,10 +78,9 @@ int main(int argc, char* argv[]) {
         }
 
         fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
-        count += 1;
     }
     
-    if (1) {
+    if (0) {
         
         recalculateDists(dists, long_walls, lat_walls, goal, 1);
         // printLatWalls(lat_walls);
