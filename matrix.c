@@ -1,6 +1,29 @@
 #include "solver.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "API.h"
+
+
+void printWalls(int **walls, int rows, int cols) {
+    for (int i = 0; i < rows; i ++){
+        for (int j = 0; j < cols; j++) {
+            fprintf(stderr, "%d ", walls[i][j]);
+        }
+        fprintf(stderr, "\n");
+    }
+}
+
+void printLongWalls(int **walls) {
+    fprintf(stderr, "Longitudal Walls... \n");
+    printWalls(walls, NUM_ROWS + 1, NUM_COLS);
+}
+
+void printLatWalls(int **walls) {
+    int rows = NUM_ROWS;
+    int cols = NUM_COLS;
+    fprintf(stderr, "Lateral Walls... \n");
+    printWalls(walls, rows, cols + 1);
+}
 
 // Returns a nxn 2d array of ints of manhattan distances from the middle 
 // of maze. 
@@ -27,7 +50,7 @@ int **create_manhattan_dists(int rows, int cols) {
 int **create_int_matrix(int rows, int cols){
     int **walls = (int **)malloc((rows) * sizeof(int *));
     for (int i = 0; i < rows; i++) {
-        walls[i] = (int *)malloc((cols + 1) * sizeof(int));
+        walls[i] = (int *)malloc((cols) * sizeof(int));
     }
 
     for (int i = 0; i < rows; i++)
@@ -65,6 +88,7 @@ int **create_long_walls(int rows, int cols) {
         walls[0][j] = 1;
         walls[rows][j] = 1;
     }
+
     return walls;
 }
 
@@ -79,25 +103,4 @@ void printGridDistances(int **grid){
         }
         fprintf(stderr, "\n");
     }
-}
-
-void printWalls(int **walls, int rows, int cols) {
-    for (int i = 0; i < rows; i ++){
-        for (int j = 0; j < cols; j++) {
-            fprintf(stderr, "%d ", walls[i][j]);
-        }
-        fprintf(stderr, "\n");
-    }
-}
-
-void printLongWalls(int **walls) {
-    fprintf(stderr, "Longitudal Walls... \n");
-    printWalls(walls, NUM_ROWS + 1, NUM_COLS + 1);
-}
-
-void printLatWalls(int **walls) {
-    int rows = NUM_ROWS;
-    int cols = NUM_COLS;
-    fprintf(stderr, "Lateral Walls... \n");
-    printWalls(walls, rows, cols + 1);
 }

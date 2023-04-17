@@ -44,7 +44,9 @@ int main(int argc, char* argv[]) {
     
 
     int count = 0;
-    while (1) {
+    int flag = 1;
+    // printLongWalls(long_walls);
+    while (flag) {
         debug_log("-----------------------");
         fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
         Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
@@ -66,20 +68,15 @@ int main(int argc, char* argv[]) {
                 debug_log("TURN RIGHT");
                 break;
             case IDLE:
+                flag = 0;
                 break;
         }
 
         fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
         count += 1;
-
-        if (curr.row == goal.row && curr.col == goal.col) {
-            goal.row = 0;
-            goal.col = 0;
-            break;
-        }
     }
     
-    if (0) {
+    if (1) {
         
         recalculateDists(dists, long_walls, lat_walls, goal, 1);
         printLatWalls(lat_walls);
@@ -91,21 +88,22 @@ int main(int argc, char* argv[]) {
         for (int j = 0; j < 4; j++) { 
             fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
         }
+
+        temp.row = 8;
+        temp.col = 8;
+        fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
+        validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
+        for (int j = 0; j < 4; j++) { 
+            fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
+        }
+
+        temp.row = 15;
+        temp.col = 0;
+        fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
+        validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
+        for (int j = 0; j < 4; j++) { 
+            fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
+        }
     }
 }
 
-
-/**
-    lat_walls[NUM_ROWS - 1][1] = 1;
-    lat_walls[NUM_ROWS - 2][1] = 1;
-    lat_walls[NUM_ROWS - 3][1] = 1;
-    printLatWalls(lat_walls);
-
-    long_walls[1][2] = 1;
-    long_walls[2][2] = 1;
-    long_walls[3][2] = 1;
-    printLongWalls(long_walls);
-
-    recalculateDists(dists, long_walls, lat_walls, goal);
-    printGridDistances(dists, NUM_ROWS, NUM_COLS);
-*/

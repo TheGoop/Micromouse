@@ -143,8 +143,9 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
 
     // BFS
     while (is_empty(q) == 0) {
-
-        fprintf(stderr, "--------- FLOOD LEVEL %d ---------\n", curr_steps);
+        if(debug) {
+            fprintf(stderr, "--------- FLOOD LEVEL %d ---------\n", curr_steps);
+        }
         // look at all of the blocks one flood level outwards
         int iters = queue_size(q);
         for (int i = 0; i < iters; i++) {
@@ -390,7 +391,11 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
 
     // debug_log("Recalculating Distances...");
     // update manhattan distances
-    recalculateDists(dists, long_walls, lat_walls, goal, 1);
+    recalculateDists(dists, long_walls, lat_walls, goal, 0);
+
+    if (curr->row == goal.row && curr->col == goal.col) {
+        return IDLE;
+    }
 
 
     int smallestDist = NUM_ROWS * NUM_COLS + 2;
