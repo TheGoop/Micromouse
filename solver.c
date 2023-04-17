@@ -80,14 +80,14 @@ void updateCoordAfterMovingForward(Coord *curr, Heading dir) {
     
 }
 
-int validCoords(Coord curr) {
+int validCoords(Coord curr, int NUM_ROWS, int NUM_COLS) {
     if ((curr.row >= 0 && curr.row < NUM_ROWS) && (curr.col >= 0 && curr.col < NUM_COLS)) {
         return 1;
     }
     return 0;
 }
 
-Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr, int notFloodFill) {
+Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr, int NUM_ROWS, int NUM_COLS, int notFloodFill) {
     Coord invalid = {-1,-1};
     Coord* moves = (Coord*)malloc(4 * sizeof(Coord));
     for (int i = 0; i < 4; i++) {
@@ -96,22 +96,22 @@ Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr,
 
     
     Coord north = {curr.row, curr.col};
-    if (validCoords(north) && (long_walls[north.row][north.col] == 0)) {
+    if (validCoords(north, NUM_ROWS, NUM_COLS) && (long_walls[north.row][north.col] == 0)) {
         moves[0].row = curr.row - 1;
         moves[0].col = curr.col;
     }
     Coord south = {curr.row + 1, curr.col};
-    if (validCoords(south) && (long_walls[south.row][south.col] == 0)) {
+    if (validCoords(south, NUM_ROWS, NUM_COLS) && (long_walls[south.row][south.col] == 0)) {
         moves[1].row = curr.row + 1;
         moves[1].col = curr.col;
     }
     Coord west = {curr.row, curr.col};
-    if (validCoords(west) && (lat_walls[curr.row][curr.col] == 0)) {
+    if (validCoords(west, NUM_ROWS, NUM_COLS) && (lat_walls[curr.row][curr.col] == 0)) {
         moves[2].row = curr.row;
         moves[2].col = curr.col - 1;
     }
     Coord east = {curr.row, curr.col + 1};
-    if (validCoords(east) && (lat_walls[east.row][east.col] == 0)) {
+    if (validCoords(east, NUM_ROWS, NUM_COLS) && (lat_walls[east.row][east.col] == 0)) {
         moves[3].row = curr.row;
         moves[3].col = curr.col + 1;
     }
@@ -120,7 +120,7 @@ Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr,
 }
 
 
-void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal, int debug) { 
+void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal, int NUM_ROWS, int NUM_COLS, int debug) { 
     // reset dists to an impossibly high number so that we don't accidentally maintain any old info
     for (int i = 0; i < NUM_ROWS; i++) {
         for (int j = 0; j < NUM_COLS; j++) {
@@ -163,10 +163,10 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
             // fprintf(stderr, "Curr: %d, %d\n", temp.row, temp.col);
             // usleep(10000);
             // add the next level of flood to the queue
-            Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
+            Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, NUM_ROWS, NUM_COLS, 0);
             for (int j = 0; j < 4; j++) {
                 // if valid moves, and not visited before, we will visit it
-                if (validCoords(validMoves[j]) && hashset_contains(visited, validMoves[j]) == 0) {
+                if (validCoords(validMoves[j], NUM_ROWS, NUM_COLS) && hashset_contains(visited, validMoves[j]) == 0) {
                     if(debug) {
                         fprintf(stderr, "Curr: %d, %d to Valid Coords: %d, %d\n", temp.row, temp.col, validMoves[j].row, validMoves[j].col);
                     }
@@ -386,7 +386,7 @@ Action getActionForNextMove(Coord start, Coord end, Heading dir) {
 
 // Put your implementation of floodfill here!
 Action floodFill(int **dists, int **long_walls, int **lat_walls, 
-        Coord goal, Coord *curr, Heading dir) 
+        Coord goal, Coord *curr, Heading dir, int NUM_ROWS, int NUM_COLS) 
 {
 
     // check for walls around curr and update wall matrices
@@ -394,7 +394,7 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
 
     // debug_log("Recalculating Distances...");
     // update manhattan distances
-    recalculateDists(dists, long_walls, lat_walls, goal, 0);
+    recalculateDists(dists, long_walls, lat_walls, goal, NUM_ROWS, NUM_COLS, 0);
 
     if (curr->row == goal.row && curr->col == goal.col) {
         return IDLE;
@@ -406,13 +406,13 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
 
     // debug_log("Getting Valid Moves...");
     // get valid blocks
-    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, *curr, 1);
+    Coord *valid_pos = getValidMoves(dists, long_walls, lat_walls, *curr, NUM_ROWS, NUM_COLS, 1);
 
     // pick block with smallest manhattan distance 
     for (int i = 0; i < 4; i++) {
         // fprintf(stderr, "%d, %d\n", valid_pos[i].row, valid_pos[i].col);
         // fprintf(stderr, "Smallest Distance: %d\n", smallestDist);
-        if (validCoords(valid_pos[i])) {
+        if (validCoords(valid_pos[i], NUM_ROWS, NUM_COLS)) {
             // fprintf(stderr, "Coord distance: %d\n", dists[valid_pos[i].row][valid_pos[i].col]);
             if (i == 0 || dists[valid_pos[i].row][valid_pos[i].col] < smallestDist) {
                 nextBlock.row = valid_pos[i].row;

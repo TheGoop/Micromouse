@@ -13,12 +13,12 @@ void printWalls(int **walls, int rows, int cols) {
     }
 }
 
-void printLongWalls(int **walls) {
+void printLongWalls(int **walls, int NUM_ROWS, int NUM_COLS) {
     fprintf(stderr, "Longitudal Walls... \n");
     printWalls(walls, NUM_ROWS + 1, NUM_COLS);
 }
 
-void printLatWalls(int **walls) {
+void printLatWalls(int **walls, int NUM_ROWS, int NUM_COLS) {
     int rows = NUM_ROWS;
     int cols = NUM_COLS;
     fprintf(stderr, "Lateral Walls... \n");
@@ -93,7 +93,7 @@ int **create_long_walls(int rows, int cols) {
 }
 
 // Prints a grid with the manhattan distances from the center of the grid
-void printGridDistances(int **grid){
+void printGridDistances(int **grid, int NUM_ROWS, int NUM_COLS){
     fprintf(stderr, "Grid Distances... \n");
     for (int i = 0; i < NUM_ROWS; i++)
     {
