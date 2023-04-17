@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
         debug_log("-----------------------");
         fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
         Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
-        // printGridDistances(dists);
+        printLongWalls(long_walls);
         switch(nextMove){
             case FORWARD:
                 API_moveForward();
@@ -79,18 +79,18 @@ int main(int argc, char* argv[]) {
     if (1) {
         
         recalculateDists(dists, long_walls, lat_walls, goal, 1);
-        printLatWalls(lat_walls);
+        // printLatWalls(lat_walls);
         printLongWalls(long_walls);
         printGridDistances(dists);
-        Coord temp = {13, 0};
+        Coord temp = {1, 0};
         fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
-        Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
+        Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 1);
         for (int j = 0; j < 4; j++) { 
             fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
         }
 
-        temp.row = 8;
-        temp.col = 8;
+        temp.row = 14;
+        temp.col = 3;
         fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
         validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
         for (int j = 0; j < 4; j++) { 

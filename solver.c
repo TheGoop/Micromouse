@@ -95,12 +95,12 @@ Coord* getValidMoves(int **dists, int **long_walls, int **lat_walls, Coord curr,
     }
 
     
-    Coord north = {curr.row - 1, curr.col};
+    Coord north = {curr.row, curr.col};
     if (validCoords(north) && (long_walls[north.row][north.col] == 0)) {
         moves[0].row = curr.row - 1;
         moves[0].col = curr.col;
     }
-    Coord south = {curr.row, curr.col};
+    Coord south = {curr.row + 1, curr.col};
     if (validCoords(south) && (long_walls[south.row][south.col] == 0)) {
         moves[1].row = curr.row + 1;
         moves[1].col = curr.col;
@@ -188,19 +188,22 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
 
 void markDirectionalWall(Coord curr, Heading wall_dir, int **long_walls, int **lat_walls) {
 
+    // 13 0 -> check 13 0
     if (wall_dir == NORTH) {
-        long_walls[curr.row - 1][curr.col] = 1;
-    }
-
-    else if (wall_dir == SOUTH) {
         long_walls[curr.row][curr.col] = 1;
     }
 
+    // 13 0 -> check 14 0
+    else if (wall_dir == SOUTH) {
+        long_walls[curr.row + 1][curr.col] = 1;
+    }
+
+    // 15 0 -> check 15 0 
     else if (wall_dir == WEST) {
         lat_walls[curr.row][curr.col] = 1;
     }
 
-    // east
+    // 15 0 -> check 15 1
     else {
         lat_walls[curr.row][curr.col + 1] = 1;
     }
@@ -231,8 +234,8 @@ void markWallsAround(Coord curr, Heading dir, int **long_walls, int **lat_walls)
     else if (dir == SOUTH) {
         // if wall south of us
         if (API_wallFront()) {
-            debug_log("Seen Wall North");
-            markDirectionalWall(curr, NORTH, long_walls, lat_walls);
+            debug_log("Seen Wall South");
+            markDirectionalWall(curr, SOUTH, long_walls, lat_walls);
         }
 
         // if wall east of us
