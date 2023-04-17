@@ -23,10 +23,49 @@ char* dirToString(Heading dir) {
     }
 }
 
-void gotoGoal(int **dists, int **long_walls, int **lat_walls, 
-        Coord *goal, Coord *curr, Heading *dir) {
-// TODO
-    
+int gotoGoal(int **dists, int **long_walls, int **lat_walls, 
+        Coord goal, Coord *curr, Heading *dir, int debug_mode) {
+    int flag = 1;
+    int count = 0;
+    while (flag) {
+        if (debug_mode) {
+            debug_log("-----------------------");
+            fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr->row, curr->col, dirToString(*dir));
+        }
+        Action nextMove = floodFill(dists, long_walls, lat_walls, goal, curr, *dir);
+        // printLongWalls(long_walls);
+        switch(nextMove){
+            case FORWARD:
+                API_moveForward();
+                updateCoordAfterMovingForward(curr, *dir);
+                if (debug_mode) {
+                    debug_log("MOVE FORWARD");
+                }
+                count += 1;
+                break;
+            case LEFT:
+                API_turnLeft();
+                updateDirectionAfterTurning(dir, LEFT);
+                if (debug_mode) {
+                    debug_log("TURN LEFT");
+                }
+                break;
+            case RIGHT:
+                API_turnRight();
+                updateDirectionAfterTurning(dir, RIGHT);
+                if (debug_mode) {
+                    debug_log("TURN RIGHT");
+                }
+                break;
+            case IDLE:
+                flag = 0;
+                break;
+        }
+
+        // fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr->row, curr->col, dirToString(*dir));
+    }
+
+    return count;
 }
 
 
@@ -40,74 +79,25 @@ int main(int argc, char* argv[]) {
     int **long_walls = create_long_walls(NUM_ROWS, NUM_COLS);
     int **lat_walls = create_lat_walls(NUM_ROWS, NUM_COLS);
 
-
+    Coord origin = {NUM_ROWS - 1,0};
     // we start at the bottom left of the grid
     Coord curr = {NUM_ROWS - 1,0};
     Heading dir = NORTH;
 
     // we aim to get to the middle of the grid
     Coord goal = {NUM_ROWS / 2, NUM_COLS / 2};
-    
 
-    int flag = 1;
-    // printLongWalls(long_walls);
-    while (flag) {
-        debug_log("-----------------------");
-        fprintf(stderr, "Figuring out move from position (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
-        Action nextMove = floodFill(dists, long_walls, lat_walls, goal, &curr, dir);
-        // printLongWalls(long_walls);
-        switch(nextMove){
-            case FORWARD:
-                API_moveForward();
-                updateCoordAfterMovingForward(&curr, dir);
-                debug_log("MOVE FORWARD");
-                break;
-            case LEFT:
-                API_turnLeft();
-                updateDirectionAfterTurning(&dir, LEFT);
-                debug_log("TURN LEFT");
-                break;
-            case RIGHT:
-                API_turnRight();
-                updateDirectionAfterTurning(&dir, RIGHT);
-                debug_log("TURN RIGHT");
-                break;
-            case IDLE:
-                flag = 0;
-                break;
-        }
+    int moves;
+    moves = gotoGoal(dists, long_walls, lat_walls, goal, &curr, &dir, 0);
+    fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
+    fprintf(stderr, "Route took %d moves\n", moves);
 
-        fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
-    }
-    
-    if (0) {
-        
-        recalculateDists(dists, long_walls, lat_walls, goal, 1);
-        // printLatWalls(lat_walls);
-        printLongWalls(long_walls);
-        printGridDistances(dists);
-        Coord temp = {1, 0};
-        fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
-        Coord* validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 1);
-        for (int j = 0; j < 4; j++) { 
-            fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
-        }
+    moves = gotoGoal(dists, long_walls, lat_walls, origin, &curr, &dir, 0);
+    fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
+    fprintf(stderr, "Route took %d moves\n", moves);
 
-        temp.row = 14;
-        temp.col = 3;
-        fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
-        validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
-        for (int j = 0; j < 4; j++) { 
-            fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
-        }
-
-        temp.row = 15;
-        temp.col = 0;
-        fprintf(stderr, "Now at (%d, %d). Facing %s \n", temp.row, temp.col, dirToString(dir));
-        validMoves = getValidMoves(dists, long_walls, lat_walls, temp, 0);
-        for (int j = 0; j < 4; j++) { 
-            fprintf(stderr, "(%d, %d)\n", validMoves[j].row, validMoves[j].col);
-        }
-    }
+    moves = gotoGoal(dists, long_walls, lat_walls, goal, &curr, &dir, 0);
+    fprintf(stderr, "Now at (%d, %d). Facing %s \n", curr.row, curr.col, dirToString(dir));
+    fprintf(stderr, "Route took %d moves\n", moves);
 }
 

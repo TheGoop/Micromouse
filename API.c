@@ -3,11 +3,14 @@
 #include <string.h>
 
 #define BUFFER_SIZE 32
+#define DEBUG_MODE 0
 
 
 void debug_log(char* text) {
-    fprintf(stderr, "%s\n", text);
-    fflush(stderr);
+    if (DEBUG_MODE) {
+        fprintf(stderr, "%s\n", text);
+        fflush(stderr);
+    }
 }
 
 int getInteger(char* command) {

@@ -139,7 +139,7 @@ void recalculateDists(int **dists, int **long_walls, int **lat_walls, Coord goal
 
     HashSet *visited = hashset_create((NUM_ROWS + 1) * (NUM_COLS + 1));
     
-    fprintf(stderr, "Queue Size: %d, Visited Size: %d\n", queue_size(q), hashset_size(visited));
+    // fprintf(stderr, "Queue Size: %d, Visited Size: %d\n", queue_size(q), hashset_size(visited));
 
     // BFS
     while (is_empty(q) == 0) {
@@ -429,9 +429,9 @@ Action floodFill(int **dists, int **long_walls, int **lat_walls,
         printGridDistances(dists);
         exit(EXIT_FAILURE);
     }
-    debug_log("Chose Best Block.");
+    // debug_log("Chose Best Block.");
 
-    fprintf(stderr, "Move to: (%d, %d)\n", nextBlock.row, nextBlock.col);
+    // fprintf(stderr, "Move to: (%d, %d)\n", nextBlock.row, nextBlock.col);
 
     // figure out relative to curr and dir, which direction to go for block
     Action nextAction = getActionForNextMove(*curr, nextBlock, dir);
